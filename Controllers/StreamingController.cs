@@ -38,7 +38,7 @@ namespace upload.Controllers
                     var fileName = Path.GetFileName(fileContent.FileName.ToString().Trim('"'));
                     var physicalPath = Path.Combine(_webHhostingEnvironment.WebRootPath, "Upload_Directory", fileName);
 
-                    // If the following is uncommented, the files will be saved to "wwwroot/Upload_Directory".
+                    // The files are not actually saved in this demo
                     //using (var fileStream = new FileStream(physicalPath, FileMode.Create))
                     //{
                     //    await formFile.CopyToAsync(fileStream);
@@ -66,7 +66,7 @@ namespace upload.Controllers
 
                     if (System.IO.File.Exists(physicalPath))
                     {
-                        // If the following is uncommented, the designated file will be removed from "wwwroot/Upload_Directory".
+                        // The files are not actually removed in this demo
                         //System.IO.File.Delete(physicalPath);
                     }
                 }
