@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,19 +30,24 @@ namespace upload.Controllers
             {
                 if (formFile.Length > 0)
                 {
-                    var filePath = Path.GetTempFileName();
 
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
+                    var fileContent = ContentDispositionHeaderValue.Parse(formFile.ContentDisposition);
+
+                    // Some browsers send file names with full path.
+                    // We are only interested in the file name.
+                    var fileName = Path.GetFileName(fileContent.FileName.ToString().Trim('"'));
+                    var physicalPath = Path.Combine(_webHhostingEnvironment.WebRootPath, "Upload_Directory", fileName);
+
+                    // If the following is uncommented, the files will be saved to "wwwroot/Upload_Directory".
+                    //using (var fileStream = new FileStream(physicalPath, FileMode.Create))
+                    //{
+                    //    await formFile.CopyToAsync(fileStream);
+                    //}
                 }
             }
 
-            // Process uploaded files
-            // Don't rely on or trust the FileName property without validation.
-
-            return Ok(new { count = files.Count, size });
+            // Return an empty string to signify success
+            return Content("");
         }
 
         [Route("api/Remove")]
@@ -54,14 +60,14 @@ namespace upload.Controllers
                 foreach (var fullName in fileNames)
                 {
                     var fileName = Path.GetFileName(fullName);
-                    var physicalPath = Path.Combine(_webHhostingEnvironment.WebRootPath, "App_Data", fileName);
+                    var physicalPath = Path.Combine(_webHhostingEnvironment.WebRootPath, "Upload_Directory", fileName);
 
                     // TODO: Verify user permissions
 
                     if (System.IO.File.Exists(physicalPath))
                     {
-                        // The files are not actually removed in this demo
-                        // System.IO.File.Delete(physicalPath);
+                        // If the following is uncommented, the designated file will be removed from "wwwroot/Upload_Directory".
+                        //System.IO.File.Delete(physicalPath);
                     }
                 }
             }
